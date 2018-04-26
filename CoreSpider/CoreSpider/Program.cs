@@ -20,7 +20,7 @@ namespace CoreSpider
             List<BlogPost> posts = new List<BlogPost>();
             int iIndex = 1;
 
-            for (int pageIndex = 1; pageIndex <= 1; pageIndex++)
+            for (int pageIndex = 1; pageIndex <= 100; pageIndex++)
             {
                 var url = "https://www.cnblogs.com/mvc/AggSite/PostList.aspx";
 
@@ -41,7 +41,7 @@ namespace CoreSpider
                     post.Author = div.QuerySelector("div.post_item_foot").Children[0].InnerHtml;
                     var foot = div.QuerySelector("div.post_item_foot").TextContent;
                     var items = foot.Split('\n');
-                    for (int i = 0; i < items.Length; i++)
+                    for (var i = 0; i < items.Length; i++)
                     {
                         post.Author = items[1].Trim();
                         post.PostTime = DateTime.Parse(items[2].Trim().Substring(3));
@@ -66,13 +66,15 @@ namespace CoreSpider
                 HttpClientHandler httpClientHandler = new HttpClientHandler
                 {
                     UseProxy = true,
-                    Proxy = new WebProxy("http://60.168.207.243:18118", false),
+                    Proxy = new WebProxy("http://154.236.177.2:8080", false),
                     PreAuthenticate = false,
                     UseDefaultCredentials = false,
                 };
 
-                var httpClient = new HttpClient();
-                httpClient.Timeout = TimeSpan.FromSeconds(30);
+                var httpClient = new HttpClient(httpClientHandler)
+                {
+                    Timeout = TimeSpan.FromSeconds(30),
+                };
 
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml");
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate");
