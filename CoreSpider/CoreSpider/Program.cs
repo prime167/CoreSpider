@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+
 using AngleSharp.Parser.Html;
 using Newtonsoft.Json;
 
@@ -17,7 +18,7 @@ namespace CoreSpider
         static async Task Main(string[] args)
         {
             Console.WriteLine("request...\r\n");
-            List<BlogPost> posts = new List<BlogPost>();
+            var posts = new List<BlogPost>();
             int iIndex = 1;
 
             for (int pageIndex = 1; pageIndex <= 100; pageIndex++)
@@ -34,11 +35,14 @@ namespace CoreSpider
 
                 foreach (var div in postDivs)
                 {
-                    var post = new BlogPost();
-                    post.Title= div.QuerySelector("a.titlelnk").InnerHtml;
-                    post.Url = div.QuerySelector("a.titlelnk").Attributes["href"].Value;
-                    post.DiggNumber = Convert.ToInt32(div.QuerySelector("span.diggnum").InnerHtml);
-                    post.Author = div.QuerySelector("div.post_item_foot").Children[0].InnerHtml;
+                    var post = new BlogPost
+                    {
+                        Title = div.QuerySelector("a.titlelnk").InnerHtml,
+                        Url = div.QuerySelector("a.titlelnk").Attributes["href"].Value,
+                        DiggNumber = Convert.ToInt32(div.QuerySelector("span.diggnum").InnerHtml),
+                        Author = div.QuerySelector("div.post_item_foot").Children[0].InnerHtml
+                    };
+
                     var foot = div.QuerySelector("div.post_item_foot").TextContent;
                     var items = foot.Split('\n');
                     for (var i = 0; i < items.Length; i++)
@@ -71,7 +75,7 @@ namespace CoreSpider
                     UseDefaultCredentials = false,
                 };
 
-                var httpClient = new HttpClient(httpClientHandler)
+                var httpClient = new HttpClient()
                 {
                     Timeout = TimeSpan.FromSeconds(30),
                 };
