@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AngleSharp.Parser.Html;
@@ -15,13 +16,21 @@ namespace CoreSpider
 {
     class Program
     {
+        //static Timer timer = new Timer(Callback, null, 0, Timeout.Infinite);
+
         static async Task Main(string[] args)
         {
+            Console.WriteLine("Get proxies...\r\n");
+
+            var spider = new IpPoolSpider();
+            spider.Initial();
+            Console.WriteLine("Get proxies end...\r\n");
+
             Console.WriteLine("request...\r\n");
             var posts = new List<BlogPost>();
             int iIndex = 1;
 
-            for (int pageIndex = 1; pageIndex <= 100; pageIndex++)
+            for (int pageIndex = 1; pageIndex <=0; pageIndex++)
             {
                 var url = "https://www.cnblogs.com/mvc/AggSite/PostList.aspx";
 
@@ -65,19 +74,20 @@ namespace CoreSpider
 
         private static async Task<string> GetResponse(string url, int pageIndex)
         {
+            var proxy = PoolManageService.GetProxy();
             try
             {
                 HttpClientHandler httpClientHandler = new HttpClientHandler
                 {
                     UseProxy = true,
-                    Proxy = new WebProxy("http://154.236.177.2:8080", false),
+                    Proxy = new WebProxy(proxy, false),
                     PreAuthenticate = false,
                     UseDefaultCredentials = false,
                 };
 
-                var httpClient = new HttpClient()
+                var httpClient = new HttpClient(httpClientHandler)
                 {
-                    Timeout = TimeSpan.FromSeconds(30),
+                    Timeout = TimeSpan.FromSeconds(5),
                 };
 
                 httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml");
